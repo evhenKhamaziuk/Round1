@@ -1,0 +1,9 @@
+<resources>
+    <string name="app_name">Round1</string>
+
+
+    <!--Error-->
+    <string name="error_internet_connection">Error internet connection</string>
+    <string name="error_connection_to_server">Error connection to server</string>
+    <string name="error_unable_to_open_web_page">Unable to open web page</string>
+</resources>
