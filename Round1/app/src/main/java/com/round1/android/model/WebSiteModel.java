@@ -7,6 +7,7 @@ public class WebSiteModel  implements Parcelable {
 
     public String name;
     public String url;
+    public String cachedPagePath;
     public boolean cached;
 
     public WebSiteModel() {
@@ -16,6 +17,7 @@ public class WebSiteModel  implements Parcelable {
     protected WebSiteModel(Parcel in) {
         name = in.readString();
         url = in.readString();
+        cachedPagePath = in.readString();
         cached = in.readByte() != 0;
     }
 
@@ -40,6 +42,7 @@ public class WebSiteModel  implements Parcelable {
     public void writeToParcel(Parcel parcel, int i) {
         parcel.writeString(name);
         parcel.writeString(url);
+        parcel.writeString(cachedPagePath);
         parcel.writeByte((byte) (cached ? 1 : 0));
     }
 }

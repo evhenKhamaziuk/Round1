@@ -1,5 +1,6 @@
 package com.round1.android.ui;
 
+import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
@@ -7,15 +8,19 @@ import android.webkit.JsResult;
 import android.webkit.WebChromeClient;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.round1.android.R;
 import com.round1.android.model.WebSiteModel;
 import com.round1.android.utils.NetworkUtils;
+import com.round1.android.utils.Utils;
 
 public class DetailsActivity extends AppCompatActivity{
 
     private WebView webView;
+    private ProgressBar progressBar;
+    private boolean cached;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -28,14 +33,15 @@ public class DetailsActivity extends AppCompatActivity{
             return;
         }
 
+        cached = data.cached;
+
         final TextView tvName = (TextView) findViewById(R.id.details_tv_name);
         tvName.setText(data.name);
 
+        progressBar = (ProgressBar) findViewById(R.id.details_progress);
         webView = (WebView) findViewById(R.id.details_web_view);
 
-        webView.getSettings().setAppCachePath(getCacheDir().getPath());
-        webView.getSettings().setAppCacheEnabled(data.cached);
-        webView.getSettings().setCacheMode(WebSettings.LOAD_DEFAULT);
+        webView.getSettings().setAppCacheEnabled(false);
         webView.getSettings().setAllowFileAccess(true);
         webView.setWebChromeClient(new ChromeClient());
         webView.setWebViewClient(new WebViewClient());
@@ -44,7 +50,11 @@ public class DetailsActivity extends AppCompatActivity{
             webView.getSettings().setCacheMode(WebSettings.LOAD_CACHE_ELSE_NETWORK);
         }
 
-        webView.loadUrl(data.url);
+        if (cached){
+            webView.loadData(Utils.getStringFromFile(data.cachedPagePath), "text/html", "utf-8");
+        }else {
+            webView.loadUrl(data.url);
+        }
     }
 
     public class WebViewClient extends android.webkit.WebViewClient {
@@ -60,6 +70,24 @@ public class DetailsActivity extends AppCompatActivity{
         public boolean shouldOverrideUrlLoading(WebView view, String url) {
             //Override url redirect if required
             return false;
+        }
+
+        @Override
+        public void onPageStarted(WebView view, String url, Bitmap favicon) {
+            super.onPageStarted(view, url, favicon);
+            if (cached){
+                return;
+            }
+            progressBar.setVisibility(View.VISIBLE);
+        }
+
+        @Override
+        public void onPageFinished(WebView view, String url) {
+            super.onPageFinished(view, url);
+            if (cached){
+                return;
+            }
+            progressBar.setVisibility(View.GONE);
         }
     }
 

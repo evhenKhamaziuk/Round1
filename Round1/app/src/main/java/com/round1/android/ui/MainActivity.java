@@ -71,7 +71,7 @@ public class MainActivity extends AppCompatActivity {
     private Callback<Response> getDataCallback = new Callback<Response>() {
         @Override
         public void success(Response response, Response response2) {
-            new WebViewsParser(onJsonParsedCallback).execute(response);
+            new WebViewsParser(getApplicationContext(), onJsonParsedCallback).execute(response);
         }
 
         @Override
@@ -84,9 +84,14 @@ public class MainActivity extends AppCompatActivity {
 
     private WebViewsParser.WebViewsParserCallback onJsonParsedCallback = new WebViewsParser.WebViewsParserCallback() {
         @Override
-        public void onSuccess(ArrayList<WebSiteModel> dataList) {
-            adapter.swapData(dataList);
-            UIUtils.hideProgressDialog(progressDialog);
+        public void onSuccess(final ArrayList<WebSiteModel> dataList) {
+            MainActivity.this.runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    adapter.swapData(dataList);
+                    UIUtils.hideProgressDialog(progressDialog);
+                }
+            });
         }
 
         @Override
